@@ -45,6 +45,14 @@ const CHECKS = [
     if (d.day !== hoy) throw new Error(`day ${d.day} ≠ hoy ${hoy}`)
     if (d.regions?.madrid?.today == null) throw new Error('madrid sin nivel')
   }],
+  ['Riesgo Asturias (Worker)', async () => {
+    const d = await (await get('https://puedo-rodar-riesgo.dtelleslopez.workers.dev/asturias')).json()
+    if (d.day !== hoy) throw new Error(`day ${d.day} ≠ hoy (¿CSV de sigvisor no publicado?)`)
+  }],
+  ['Riesgo La Rioja (Worker)', async () => {
+    const d = await (await get('https://puedo-rodar-riesgo.dtelleslopez.workers.dev/larioja')).json()
+    if (d.day !== hoy) throw new Error(`day ${d.day} ≠ hoy (¿datos.jsp sin referencia de víspera?)`)
+  }],
   ['Riesgo Navarra (WFS)', async () => {
     const d = await (await get('https://inspire.navarra.es/services/riesgoIncendios/wfs?service=WFS&version=2.0.0&request=GetFeature&outputFormat=application/json&propertyName=IdRiesgo&typeNames=riesgoIncendios:vw_riesgomunicipiod0&count=5')).json()
     if (!Array.isArray(d.features) || d.features.length === 0) throw new Error('sin features')
