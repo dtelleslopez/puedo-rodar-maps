@@ -1,0 +1,40 @@
+# Vigía diario: comprueba la cadena completa de Puedo Rodar (web, tiles R2,
+# fuentes de riesgo, Worker, JSONs de las Actions). Si algo falla, el workflow
+# queda en rojo Y se abre/actualiza un issue con la etiqueta "vigia" — GitHub
+# manda email al dueño del repo. Pega ese issue en una sesión de Claude para
+# arreglarlo.
+name: Vigía diario
+
+on:
+  schedule:
+    # 16:30 UTC = 18:30 CEST, cuando ya han corrido todas las fuentes del día.
+    - cron: '30 16 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  vigia:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Comprobar la cadena
+        run: node vigia/check.mjs
+
+      - name: Abrir o actualizar issue si algo falla
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh label create vigia --color D93F0B --description "Aviso del vigía diario" --force
+          cuerpo=$(cat vigia-report.txt 2>/dev/null || echo "El chequeo no llegó a generar informe: mira el log del workflow.")
+          existente=$(gh issue list --label vigia --state open --json number --jq '.[0].number')
+          if [ -n "$existente" ]; then
+            gh issue comment "$existente" --body "$cuerpo"
+          else
+            gh issue create --title "🔴 Vigía: algo falla ($(date -u +%F))" --body "$cuerpo" --label vigia
+          fi
