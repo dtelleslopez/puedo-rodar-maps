@@ -61,6 +61,10 @@ const CHECKS = [
     const d = await (await get('https://puedo-rodar-riesgo.dtelleslopez.workers.dev/andalucia')).json()
     if (d.day !== hoy) throw new Error(`day ${d.day} ≠ hoy (¿WMS REDIAM congelado?)`)
   }],
+  ['Riesgo Extremadura (Worker+INFOEX)', async () => {
+    const d = await (await get('https://puedo-rodar-riesgo.dtelleslopez.workers.dev/extremadura')).json()
+    if (d.day !== hoy) throw new Error(`day ${d.day} ≠ hoy (el servidor de INFOEX se cae a menudo)`)
+  }],
   ['Riesgo Navarra (WFS)', async () => {
     const d = await (await get('https://inspire.navarra.es/services/riesgoIncendios/wfs?service=WFS&version=2.0.0&request=GetFeature&outputFormat=application/json&propertyName=IdRiesgo&typeNames=riesgoIncendios:vw_riesgomunicipiod0&count=5')).json()
     if (!Array.isArray(d.features) || d.features.length === 0) throw new Error('sin features')
