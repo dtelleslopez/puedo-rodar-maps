@@ -1,0 +1,36 @@
+# Publica a diario aemet/aemet.json con el índice de riesgo de incendio de
+# AEMET (GeoTIFF nacional, escala 1-6) muestreado por comunidades sin fuente
+# propia (Madrid, Murcia, Cantabria, Castilla y León, Baleares — las tres
+# primeras delegan oficialmente en AEMET). La app solo lo muestra si `day` es
+# hoy: si esta Action se rompe, dirá "no comprobado" en vez de datos viejos.
+name: Riesgo AEMET diario
+
+on:
+  schedule:
+    # La pasada de AEMET se publica la tarde-noche anterior (~21:30Z);
+    # a las 05:15Z ya está estable y D+1 de la pasada = hoy.
+    - cron: '15 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  aemet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Descargar y muestrear el GeoTIFF de AEMET
+        run: |
+          python3 aemet/parse-aemet.py > aemet/aemet.json
+          cat aemet/aemet.json
+
+      - name: Publicar si hay cambios
+        run: |
+          git config user.name "aemet-bot"
+          git config user.email "actions@github.com"
+          git add aemet/aemet.json
+          git diff --cached --quiet && echo "sin cambios" && exit 0
+          git commit -m "aemet: riesgo $(date -u +%F)"
+          git push
