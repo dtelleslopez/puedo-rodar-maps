@@ -65,6 +65,10 @@ const CHECKS = [
     const d = await (await get('https://puedo-rodar-riesgo.dtelleslopez.workers.dev/extremadura')).json()
     if (d.day !== hoy) throw new Error(`day ${d.day} ≠ hoy (el servidor de INFOEX se cae a menudo)`)
   }],
+  ['Alertas Canarias (WP-JSON)', async () => {
+    const d = await (await get('https://www3.gobiernodecanarias.org/noticias/wp-json/wp/v2/posts?categories=24&per_page=5&_fields=title,date')).json()
+    if (!Array.isArray(d) || d.length === 0) throw new Error('sin posts de alertas')
+  }],
   ['Riesgo Navarra (WFS)', async () => {
     const d = await (await get('https://inspire.navarra.es/services/riesgoIncendios/wfs?service=WFS&version=2.0.0&request=GetFeature&outputFormat=application/json&propertyName=IdRiesgo&typeNames=riesgoIncendios:vw_riesgomunicipiod0&count=5')).json()
     if (!Array.isArray(d.features) || d.features.length === 0) throw new Error('sin features')
