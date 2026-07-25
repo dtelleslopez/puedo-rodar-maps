@@ -1,0 +1,44 @@
+# Publica a diario napif/napif.json con el Nivel de Alerta de Peligro de
+# Incendios Forestales de Aragón, parseado del PDF oficial (única fuente
+# pública; la API de infoar exige autenticación). La app de Puedo Rodar lo lee
+# de raw.githubusercontent.com, que sirve con CORS abierto, y solo lo muestra
+# si `day` es hoy — si esta Action se rompe, la app dirá "no comprobado" en
+# vez de enseñar un boletín caducado.
+name: NAPIF Aragón diario
+
+on:
+  schedule:
+    # El boletín se publica antes de las 12:00 (hora peninsular). Dos pasadas
+    # para cubrir retrasos: 10:15 y 12:15 UTC (12:15 y 14:15 CEST).
+    - cron: '15 10,12 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  napif:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar poppler (pdftotext)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+
+      - name: Descargar y parsear el PDF del NAPIF
+        run: |
+          curl -sSf --max-time 60 \
+            "https://infoar.aragon.es/flamabk/indicesMeteo/napif-pdf/download" \
+            -o /tmp/napif.pdf
+          pdftotext -layout /tmp/napif.pdf /tmp/napif.txt
+          node napif/parse-napif.mjs /tmp/napif.txt > napif/napif.json
+          cat napif/napif.json
+
+      - name: Publicar si hay cambios
+        run: |
+          git config user.name "napif-bot"
+          git config user.email "actions@github.com"
+          git add napif/napif.json
+          git diff --cached --quiet && echo "sin cambios" && exit 0
+          git commit -m "napif: boletín $(date -u +%F)"
+          git push
