@@ -1,12 +1,12 @@
 {
-  "day": "2026-07-26",
-  "generatedAt": "2026-07-26T13:55:43.816Z",
+  "day": "2026-07-27",
+  "generatedAt": "2026-07-27T13:22:18.015Z",
   "redToday": {
-    "count": 8,
-    "text": "Bajo Ebro Forestal, Muelas del Ebro-Alcubierre, Somontano Occidental, Somontano Oriental, Valle del Ebro Agrícola, Muelas del Ebro-Valmadrid, Muelas del Ebro-Zuera y Prepirineo Oriental."
-  },
-  "redTomorrow": {
     "count": 1,
     "text": "Mijares."
+  },
+  "redTomorrow": {
+    "count": 18,
+    "text": "Bajo Ebro Forestal, Gúdar, Javalambre, Jiloca-Gallocanta, Maestrazgo, Mijares, Muela de Alcubierre, Muela de Valmadrid, Muela de Zuera."
   }
 }
