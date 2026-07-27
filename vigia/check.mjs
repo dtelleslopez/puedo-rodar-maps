@@ -5,6 +5,7 @@
 import { writeFileSync } from 'node:fs'
 
 const hoy = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(new Date())
+const manana = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(new Date(Date.now() + 86400000))
 const mes = Number(hoy.slice(5, 7))
 
 const get = (url, opts = {}) => fetch(url, { signal: AbortSignal.timeout(30000), ...opts })
@@ -59,7 +60,9 @@ const CHECKS = [
   }],
   ['Riesgo Andalucía (Worker+WMS)', async () => {
     const d = await (await get('https://puedo-rodar-riesgo.dtelleslopez.workers.dev/andalucia')).json()
-    if (d.day !== hoy) throw new Error(`day ${d.day} ≠ hoy (¿WMS REDIAM congelado?)`)
+    // REDIAM rota el boletín al día siguiente por la tarde: day == mañana es
+    // fuente viva y fresca. Congelado de verdad = fecha pasada.
+    if (d.day !== hoy && d.day !== manana) throw new Error(`day ${d.day} ≠ hoy/mañana (¿WMS REDIAM congelado?)`)
   }],
   ['Riesgo Extremadura (Worker+INFOEX)', async () => {
     const d = await (await get('https://puedo-rodar-riesgo.dtelleslopez.workers.dev/extremadura')).json()
@@ -82,17 +85,34 @@ const CHECKS = [
   }],
 ]
 
-const lines = []
-let fallos = 0
+// Dos pasadas: los checks fallados se reintentan UNA vez a los 3 minutos.
+// Motivo: varias fuentes tienen transitorios reales a la hora del vigía
+// (ventanas de regeneración del boletín en La Rioja/REDIAM, cuelgues
+// intermitentes de api.euskadi.eus desde IPs de Cloudflare) que no son
+// averías y no merecen email.
+const errores = new Map()
 for (const [name, fn] of CHECKS) {
-  try {
-    await fn()
-    lines.push(`✅ ${name}`)
-  } catch (e) {
-    fallos++
-    lines.push(`❌ ${name} — ${e.message}`)
+  try { await fn() } catch (e) { errores.set(name, e.message) }
+}
+const recuperados = new Set()
+if (errores.size > 0) {
+  await new Promise((r) => setTimeout(r, 180000))
+  for (const [name] of [...errores]) {
+    const [, fn] = CHECKS.find(([n]) => n === name)
+    try {
+      await fn()
+      errores.delete(name)
+      recuperados.add(name)
+    } catch (e) {
+      errores.set(name, `${e.message} (persiste tras reintento a los 3 min)`)
+    }
   }
 }
+const lines = CHECKS.map(([name]) =>
+  errores.has(name) ? `❌ ${name} — ${errores.get(name)}`
+    : recuperados.has(name) ? `✅ ${name} (al 2º intento)`
+      : `✅ ${name}`)
+const fallos = errores.size
 const report = `Vigía Puedo Rodar · ${hoy}\n\n${lines.join('\n')}\n`
 console.log(report)
 writeFileSync('vigia-report.txt', report)
