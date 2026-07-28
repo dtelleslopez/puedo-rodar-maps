@@ -1,12 +1,12 @@
 {
-  "day": "2026-07-27",
-  "generatedAt": "2026-07-27T13:22:18.015Z",
+  "day": "2026-07-28",
+  "generatedAt": "2026-07-28T12:12:49.993Z",
   "redToday": {
-    "count": 1,
-    "text": "Mijares."
-  },
-  "redTomorrow": {
     "count": 18,
     "text": "Bajo Ebro Forestal, Gúdar, Javalambre, Jiloca-Gallocanta, Maestrazgo, Mijares, Muela de Alcubierre, Muela de Valmadrid, Muela de Zuera."
+  },
+  "redTomorrow": {
+    "count": 25,
+    "text": "Bajo Ebro Forestal, Depresión del Jalón, Gúdar, Javalambre, Jiloca-Gallocanta, Maestrazgo, Mijares, Moncayo y Aranda, Muela de Alcubierre, Muela de Valmadrid, Muela de Zuera."
   }
 }
