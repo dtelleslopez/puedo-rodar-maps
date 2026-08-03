@@ -1,12 +1,12 @@
 {
-  "day": "2026-08-02",
-  "generatedAt": "2026-08-02T13:53:35.329Z",
+  "day": "2026-08-03",
+  "generatedAt": "2026-08-03T13:20:19.392Z",
   "redToday": {
-    "count": 26,
-    "text": "Todo Aragón."
+    "count": 17,
+    "text": "Bajo Ebro Forestal, Depresión del Jalón, Gúdar, Javalambre, Jiloca-Gallocanta, Maestrazgo, Mijares, Moncayo y Aranda, Montes Universales, Muela de Alcubierre, Muela de Valmadrid, Prepirineo Oriental, Rodeno, Sierras Ibéricas Centrales, Somontano Oriental , Somontano Sur y Turia."
   },
   "redTomorrow": {
-    "count": 23,
-    "text": "Todo Aragón excepto Pirineo Occidental, Pirineo Axial y Puertos de Beceite."
+    "count": 13,
+    "text": "Bajo Ebro Forestal, Depresión del Jalón, Gúdar, Javalambre, Jiloca-Gallocanta, Maestrazgo, Mijares, Moncayo y Aranda, Prepirineo Occidental, Sierras Ibéricas Centrales, Somontano Occidental, Somontano Sur y Turia."
   }
 }
