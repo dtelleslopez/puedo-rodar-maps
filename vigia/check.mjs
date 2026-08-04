@@ -5,8 +5,15 @@
 import { writeFileSync } from 'node:fs'
 
 const hoy = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(new Date())
+const ayer = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(new Date(Date.now() - 86400000))
 const manana = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(new Date(Date.now() + 86400000))
 const mes = Number(hoy.slice(5, 7))
+// Hora local de Madrid: en lanzamientos manuales fuera del cron (16:30Z) hay
+// que relajar los checks de frescura — de madrugada/mañana las fuentes diarias
+// (NAPIF 10:15/12:15Z, AEMET 05:15Z) aún no han publicado el dato de hoy y
+// «day = ayer» no es avería, es el calendario.
+const horaMadrid = Number(new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Madrid' }).slice(11, 13))
+const esManana = horaMadrid < 14
 
 const get = (url, opts = {}) => fetch(url, { signal: AbortSignal.timeout(30000), ...opts })
 
@@ -39,11 +46,12 @@ const CHECKS = [
   }],
   ['NAPIF Aragón (json de la Action)', async () => {
     const d = await (await get('https://raw.githubusercontent.com/dtelleslopez/puedo-rodar-maps/main/napif/napif.json')).json()
+    if (d.day === ayer && esManana) return // su Action corre a las 10:15/12:15Z
     if (d.day !== hoy) throw new Error(`day ${d.day} ≠ hoy ${hoy} (¿Action rota o PDF no publicado?)`)
   }],
   ['Riesgo AEMET (json de la Action)', async () => {
     const d = await (await get('https://raw.githubusercontent.com/dtelleslopez/puedo-rodar-maps/main/aemet/aemet.json')).json()
-    if (d.day !== hoy) throw new Error(`day ${d.day} ≠ hoy ${hoy}`)
+    if (d.day !== hoy && !(d.day === ayer && esManana)) throw new Error(`day ${d.day} ≠ hoy ${hoy}`)
     if (d.regions?.madrid?.today == null) throw new Error('madrid sin nivel')
   }],
   ['Riesgo Asturias (Worker)', async () => {
@@ -81,7 +89,11 @@ const CHECKS = [
     const d = await (await get('https://services-eu1.arcgis.com/LVA9E9zjh6QfM7Mo/arcgis/rest/services/IPP_Administrativo_Web_Vista_2025/FeatureServer/0?f=json')).json()
     const editado = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' })
       .format(new Date(Number(d?.editingInfo?.dataLastEditDate)))
-    if (editado !== hoy) throw new Error(`dataLastEditDate ${editado} ≠ hoy (¿cambió el año del servicio?)`)
+    // Se tolera «ayer»: la JCCM publica a veces DESPUÉS del vigía (visto el
+    // 01-08 y el 04-08, este a las 18:23Z vs check a las 18:14Z). El caso que
+    // este check debe cazar —el servicio congelado durante meses— sigue
+    // saltando igual, como mucho un día más tarde.
+    if (editado !== hoy && editado !== ayer) throw new Error(`dataLastEditDate ${editado} ≠ hoy/ayer (¿cambió el año del servicio?)`)
   }],
 ]
 
