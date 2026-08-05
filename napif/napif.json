@@ -1,12 +1,12 @@
 {
-  "day": "2026-08-04",
-  "generatedAt": "2026-08-04T12:17:39.838Z",
+  "day": "2026-08-05",
+  "generatedAt": "2026-08-05T12:15:25.498Z",
   "redToday": {
-    "count": 15,
-    "text": "Bajo Ebro Forestal, Depresión del Jalón, Gúdar, Javalambre, Jiloca-Gallocanta, Maestrazgo, Mijares, Moncayo y Aranda, Prepirineo Occidental, Prepirineo Oriental, Puertos de Beceite, Sierras Ibéricas Centrales, Somontano Occidental , Somontano Sur y Turia."
+    "count": 4,
+    "text": "Jiloca-Gallocanta, Maestrazgo, Somontano Occidental y Turia."
   },
   "redTomorrow": {
-    "count": 8,
-    "text": "Bajo Ebro Forestal, Depresión del Jalón, Jiloca-Gallocanta, Maestrazgo, Moncayo y Aranda, Rodeno, Somontano Occidental, Somontano Sur y Turia."
+    "count": 2,
+    "text": "Mijares y Turia."
   }
 }
