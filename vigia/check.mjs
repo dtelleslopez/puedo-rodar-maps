@@ -6,7 +6,6 @@ import { writeFileSync } from 'node:fs'
 
 const hoy = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(new Date())
 const ayer = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(new Date(Date.now() - 86400000))
-const manana = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(new Date(Date.now() + 86400000))
 const mes = Number(hoy.slice(5, 7))
 // Hora local de Madrid: en lanzamientos manuales fuera del cron (16:30Z) hay
 // que relajar los checks de frescura — de madrugada/mañana las fuentes diarias
@@ -68,9 +67,11 @@ const CHECKS = [
   }],
   ['Riesgo Andalucía (Worker+WMS)', async () => {
     const d = await (await get('https://puedo-rodar-riesgo.dtelleslopez.workers.dev/andalucia')).json()
-    // REDIAM rota el boletín al día siguiente por la tarde: day == mañana es
-    // fuente viva y fresca. Congelado de verdad = fecha pasada.
-    if (d.day !== hoy && d.day !== manana) throw new Error(`day ${d.day} ≠ hoy/mañana (¿WMS REDIAM congelado?)`)
+    // REDIAM publica un boletín de 3 días y no lo renueva a diario, así que la
+    // capa de hoy no siempre es dia_1; el Worker la busca por fecha y devuelve
+    // day = hoy siempre que el boletín vigente cubra hoy. Otra cosa (o 502) es
+    // que Andalucía se quede en "no comprobado": eso sí hay que mirarlo.
+    if (d.day !== hoy) throw new Error(`day ${d.day} ≠ hoy (¿boletín REDIAM sin cubrir hoy?)`)
   }],
   ['Riesgo Extremadura (Worker+INFOEX)', async () => {
     const d = await (await get('https://puedo-rodar-riesgo.dtelleslopez.workers.dev/extremadura')).json()
