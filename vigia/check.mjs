@@ -17,6 +17,8 @@ const esManana = horaMadrid < 14
 const get = (url, opts = {}) => fetch(url, { signal: AbortSignal.timeout(30000), ...opts })
 
 const AND_WMS = 'https://www.juntadeandalucia.es/medioambiente/mapwms/REDIAM_Indice_Riesgo_Incendios_Diario'
+const SUPABASE = 'https://jnczvwduwzaoapqvcdva.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_ys7F_jkWvQOIILK7qN2mxw_3u4YBBmy'
 
 // Días de gracia por fuente: las que tienen caídas transitorias documentadas no
 // escalan a email al primer tropiezo, solo si el fallo se repite N días
@@ -27,6 +29,7 @@ const GRACIA = {
   'Riesgo La Rioja (Worker)': 2, // ventana de regeneración vespertina de datos.jsp
   'Riesgo Andalucía (Worker+WMS)': 2, // el WMS de la Junta va a ratos
   'Riesgo Asturias (Worker)': 2, // sigvisor publica tarde algunos días
+  'Supabase: spatial_ref_sys poblada (canario)': 2, // un 5xx suelto de Supabase no es un vaciado
 }
 
 const CHECKS = [
@@ -101,6 +104,20 @@ const CHECKS = [
   ['Riesgo Extremadura (Worker+INFOEX)', async () => {
     const d = await (await get('https://puedo-rodar-riesgo.dtelleslopez.workers.dev/extremadura')).json()
     if (d.day !== hoy) throw new Error(`day ${d.day} ≠ hoy (el servidor de INFOEX se cae a menudo)`)
+  }],
+  ['Supabase: spatial_ref_sys poblada (canario)', async () => {
+    // PostGIS deja public.spatial_ref_sys sin RLS y con permiso de ESCRITURA
+    // para anon, y no podemos quitárselo: la tabla es de supabase_admin y ni
+    // postgres ni supabase_privileged_role pueden revocar ni activar RLS (ver
+    // migración 0025 del repo principal — está pedido a soporte de Supabase).
+    // O sea que cualquiera puede vaciarla y dejar sin sistemas de referencia a
+    // los triggers de cierres. Si pasa, que se sepa el mismo día.
+    // La clave es la publishable (pública por diseño, va en el bundle de la web).
+    const res = await get(`${SUPABASE}/rest/v1/spatial_ref_sys?select=srid`, {
+      headers: { apikey: SUPABASE_KEY, Prefer: 'count=exact', Range: '0-0' },
+    })
+    const total = Number(res.headers.get('content-range')?.split('/')[1])
+    if (!(total >= 8000)) throw new Error(`solo ${total} SRID (¿alguien ha vaciado spatial_ref_sys?)`)
   }],
   ['Alertas Canarias (WP-JSON)', async () => {
     const d = await (await get('https://www3.gobiernodecanarias.org/noticias/wp-json/wp/v2/posts?categories=24&per_page=5&_fields=title,date')).json()
