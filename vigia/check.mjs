@@ -2,7 +2,7 @@
 // (web, tiles R2, fuentes de riesgo de incendio, Worker, JSONs de las
 // Actions). Escribe vigia-report.txt y sale con código 1 si algo falla — el
 // workflow abre entonces un issue para avisar al admin.
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 
 const hoy = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(new Date())
 const ayer = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(new Date(Date.now() - 86400000))
@@ -15,6 +15,19 @@ const horaMadrid = Number(new Date().toLocaleString('sv-SE', { timeZone: 'Europe
 const esManana = horaMadrid < 14
 
 const get = (url, opts = {}) => fetch(url, { signal: AbortSignal.timeout(30000), ...opts })
+
+const AND_WMS = 'https://www.juntadeandalucia.es/medioambiente/mapwms/REDIAM_Indice_Riesgo_Incendios_Diario'
+
+// Días de gracia por fuente: las que tienen caídas transitorias documentadas no
+// escalan a email al primer tropiezo, solo si el fallo se repite N días
+// seguidos. Un rato malo de INFOEX no es una avería; tres días sí.
+const GRACIA = {
+  'Riesgo Extremadura (Worker+INFOEX)': 3, // servidor MUY inestable, se cae a ratos
+  'Avisos País Vasco (Worker+Euskalmet)': 2, // api.euskadi.eus cuelga desde IPs de CF
+  'Riesgo La Rioja (Worker)': 2, // ventana de regeneración vespertina de datos.jsp
+  'Riesgo Andalucía (Worker+WMS)': 2, // el WMS de la Junta va a ratos
+  'Riesgo Asturias (Worker)': 2, // sigvisor publica tarde algunos días
+}
 
 const CHECKS = [
   ['web puedorodar.com/app', async () => {
@@ -66,12 +79,24 @@ const CHECKS = [
     if (d.day !== hoy) throw new Error(`day ${d.day} ≠ hoy (¿JWT caducado o API cambiada?)`)
   }],
   ['Riesgo Andalucía (Worker+WMS)', async () => {
+    // REDIAM publica un boletín de TRES DÍAS que empieza en D+1: el emitido el
+    // 11-08 tiene capas 12, 13 y 14. O sea que hoy sale de la predicción de
+    // AYER, y en cuanto por la tarde entra la de hoy, HOY deja de estar
+    // publicado y el Worker responde 502 con toda la razón. Esa rotación cae
+    // justo en la ventana del vigía (16:30Z + el retraso del cron de GitHub),
+    // así que preguntar "¿tiene el Worker el dato de hoy?" da falsos rojos casi
+    // a diario. La pregunta buena es "¿sigue viva y fresca la fuente?".
+    const caps = await (await get(`${AND_WMS}?request=getcapabilities&service=WMS`)).text()
+    const dias = [...caps.matchAll(/<Name>indice_riesgo_dia_\d<\/Name>\s*<Title>[^<]*?(\d{2})-(\d{2})-(\d{4})/g)]
+      .map((m) => `${m[3]}-${m[2]}-${m[1]}`).sort()
+    if (dias.length === 0) throw new Error('GetCapabilities sin capas indice_riesgo_dia_N (¿cambió el WMS?)')
+    if (dias.at(-1) < hoy) throw new Error(`boletín congelado: la última capa es del ${dias.at(-1)}`)
     const d = await (await get('https://puedo-rodar-riesgo.dtelleslopez.workers.dev/andalucia')).json()
-    // REDIAM publica un boletín de 3 días y no lo renueva a diario, así que la
-    // capa de hoy no siempre es dia_1; el Worker la busca por fecha y devuelve
-    // day = hoy siempre que el boletín vigente cubra hoy. Otra cosa (o 502) es
-    // que Andalucía se quede en "no comprobado": eso sí hay que mirarlo.
-    if (d.day !== hoy) throw new Error(`day ${d.day} ≠ hoy (¿boletín REDIAM sin cubrir hoy?)`)
+    // Si el boletín TODAVÍA cubre hoy, el Worker tiene que darlo; si ya rotó,
+    // el 502 es el comportamiento correcto y la app dirá "no comprobado".
+    if (dias.includes(hoy) && d.day !== hoy) {
+      throw new Error(`day ${d.day} ≠ hoy con la capa de hoy publicada (¿Worker roto?)`)
+    }
   }],
   ['Riesgo Extremadura (Worker+INFOEX)', async () => {
     const d = await (await get('https://puedo-rodar-riesgo.dtelleslopez.workers.dev/extremadura')).json()
@@ -121,12 +146,35 @@ if (errores.size > 0) {
     }
   }
 }
-const lines = CHECKS.map(([name]) =>
-  errores.has(name) ? `❌ ${name} — ${errores.get(name)}`
-    : recuperados.has(name) ? `✅ ${name} (al 2º intento)`
-      : `✅ ${name}`)
-const fallos = errores.size
+// Racha de fallos por check, guardada en vigia/state.json y commiteada por el
+// workflow. Sirve para no mandar email por un mal rato de una fuente ajena:
+// solo se escala cuando el fallo se repite GRACIA[name] días SEGUIDOS. Un día
+// verde borra la racha.
+const STATE = new URL('./state.json', import.meta.url)
+let estado = {}
+try { estado = JSON.parse(readFileSync(STATE, 'utf8')) } catch { /* primera vez */ }
+
+const escalados = new Set()
+for (const [name] of CHECKS) {
+  if (!errores.has(name)) { delete estado[name]; continue }
+  const prev = estado[name]
+  const dias = prev?.ultimo === hoy ? prev.dias // relanzado el mismo día: no cuenta doble
+    : prev?.ultimo === ayer ? prev.dias + 1 // racha continua
+      : 1 // racha nueva (o con hueco: empezamos a contar otra vez)
+  estado[name] = { desde: prev?.ultimo === ayer || prev?.ultimo === hoy ? prev.desde : hoy, ultimo: hoy, dias }
+  if (dias >= (GRACIA[name] ?? 1)) escalados.add(name)
+}
+writeFileSync(STATE, `${JSON.stringify(estado, null, 2)}\n`)
+
+const lines = CHECKS.map(([name]) => {
+  if (!errores.has(name)) return recuperados.has(name) ? `✅ ${name} (al 2º intento)` : `✅ ${name}`
+  const { dias, desde } = estado[name]
+  const tope = GRACIA[name] ?? 1
+  return escalados.has(name)
+    ? `❌ ${name} — ${errores.get(name)}${tope > 1 ? ` [${dias} días seguidos desde ${desde}]` : ''}`
+    : `⚠️ ${name} — ${errores.get(name)} [fuente con caídas conocidas: día ${dias} de ${tope}, aún no escalo]`
+})
 const report = `Vigía Puedo Rodar · ${hoy}\n\n${lines.join('\n')}\n`
 console.log(report)
 writeFileSync('vigia-report.txt', report)
-process.exit(fallos > 0 ? 1 : 0)
+process.exit(escalados.size > 0 ? 1 : 0)

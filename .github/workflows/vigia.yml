@@ -1,8 +1,12 @@
 # Vigía diario: comprueba la cadena completa de Puedo Rodar (web, tiles R2,
-# fuentes de riesgo, Worker, JSONs de las Actions). Si algo falla, el workflow
-# queda en rojo Y se abre/actualiza un issue con la etiqueta "vigia" — GitHub
-# manda email al dueño del repo. Pega ese issue en una sesión de Claude para
-# arreglarlo.
+# fuentes de riesgo, Worker, JSONs de las Actions). Si algo falla DE VERDAD, el
+# workflow queda en rojo Y se abre/actualiza un issue con la etiqueta "vigia" —
+# GitHub manda email al dueño del repo. Pega ese issue en una sesión de Claude
+# para arreglarlo.
+# "De verdad" = las fuentes con caídas transitorias documentadas (INFOEX,
+# Euskalmet, REDIAM…) tienen días de gracia: un tropiezo suelto sale como ⚠️ en
+# el log y el run sigue verde; solo escala si se repite N días seguidos. La
+# racha vive en vigia/state.json y la commitea este workflow.
 name: Vigía diario
 
 on:
@@ -12,7 +16,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write # commitear vigia/state.json (la racha de fallos)
   issues: write
 
 jobs:
@@ -23,6 +27,21 @@ jobs:
 
       - name: Comprobar la cadena
         run: node vigia/check.mjs
+
+      # Siempre, aunque el chequeo salga en rojo: si no se guarda la racha, un
+      # fallo persistente volvería a contar como "día 1" mañana y no escalaría
+      # nunca.
+      - name: Guardar la racha de fallos
+        if: always()
+        run: |
+          [ -f vigia/state.json ] || { echo "sin state.json (el chequeo ni arrancó)"; exit 0; }
+          git config user.name "vigia-bot"
+          git config user.email "actions@github.com"
+          git add vigia/state.json
+          git diff --cached --quiet && echo "sin cambios en la racha" && exit 0
+          git commit -m "vigia: racha $(date -u +%F)"
+          git pull --rebase --autostash
+          git push
 
       - name: Abrir o actualizar issue si algo falla
         if: failure()
