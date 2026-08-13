@@ -1,7 +1,7 @@
 {
- "day": "2026-08-12",
- "run": "2026-08-11",
- "generatedAt": "2026-08-12T06:40:52.528036+00:00",
+ "day": "2026-08-13",
+ "run": "2026-08-12",
+ "generatedAt": "2026-08-13T06:43:51.688873+00:00",
  "regions": {
   "madrid": {
    "today": 6,
@@ -20,8 +20,8 @@
    "tomorrow": 6
   },
   "baleares": {
-   "today": 6,
-   "tomorrow": 6
+   "today": 5,
+   "tomorrow": 5
   }
  }
 }
