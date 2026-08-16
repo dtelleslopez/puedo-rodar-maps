@@ -1,12 +1,12 @@
 {
-  "day": "2026-08-15",
-  "generatedAt": "2026-08-15T12:58:25.604Z",
+  "day": "2026-08-16",
+  "generatedAt": "2026-08-16T10:39:16.891Z",
   "redToday": {
-    "count": 14,
-    "text": "Bajo Ebro Forestal, Depresión del Jalón, Jiloca-Gallocanta, Moncayo y Aranda, Muela de Alcubierre, Muela de Valmadrid, Muela de Zuera, Prepirineo Occidental, Prepirineo Oriental, Sierras Ibéricas Centrales, Somontano Occidental, Somontano Oriental, Turia y Valle del Ebro Agrícola."
+    "count": 8,
+    "text": "Bajo Ebro Forestal, Muela de Alcubierre, Muela de Valmadrid, Muela de Zuera, Prepirineo Occidental, Prepirineo Oriental, Somontano Occidental y Somontano Oriental."
   },
   "redTomorrow": {
-    "count": 5,
-    "text": "Bajo Ebro Forestal, Muela de Alcubierre, Muela de Valmadrid, Muela de Zuera y Somontano Occidental."
+    "count": 7,
+    "text": "Bajo Ebro Forestal, Muela de Alcubierre, Muela de Zuera, Prepirineo Occidental, Prepirineo Oriental, Somontano Occidental y Somontano Oriental."
   }
 }
