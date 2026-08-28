@@ -1,12 +1,12 @@
 {
-  "day": "2026-08-27",
-  "generatedAt": "2026-08-27T20:29:29.250Z",
+  "day": "2026-08-28",
+  "generatedAt": "2026-08-28T21:10:42.915Z",
   "redToday": {
-    "count": 0,
-    "text": null
+    "count": 4,
+    "text": "Bajo Ebro Forestal, Muela de Valmadrid, Somontano Oriental y Somontano Sur."
   },
   "redTomorrow": {
-    "count": 2,
-    "text": "Muela de Valmadrid y Somontano Sur."
+    "count": 0,
+    "text": null
   }
 }
