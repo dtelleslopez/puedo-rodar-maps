@@ -1,12 +1,12 @@
 {
-  "day": "2026-08-29",
-  "generatedAt": "2026-08-29T15:03:56.067Z",
+  "day": "2026-08-30",
+  "generatedAt": "2026-08-30T14:52:22.610Z",
   "redToday": {
-    "count": 3,
-    "text": "Sierras Ibéricas Centrales, Somontano Sur y Puertos de Beceite."
+    "count": 12,
+    "text": "Pirineo Occidental, Somontano Oriental, Muela de Valmadrid, Bajo Ebro Forestal, Somontano Sur, Puertos de Beceite, Moncayo y Aranda, Depresión del Jalón, Sierras Ibéricas Centrales, Jiloca-Gallocanta, Maestrazgo y Turia."
   },
   "redTomorrow": {
-    "count": 10,
-    "text": "Somontano Oriental, Bajo Ebro Forestal, Somontano Sur, Puertos de Beceite, Moncayo y Aranda, Depresión del Jalón, Sierras Ibéricas Centrales, Jiloca- Gallocanta, Maestrazgo y Turia."
+    "count": 2,
+    "text": "Turia y Rodeno."
   }
 }
