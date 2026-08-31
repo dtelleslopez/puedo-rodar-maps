@@ -1,12 +1,12 @@
 {
-  "day": "2026-08-30",
-  "generatedAt": "2026-08-30T14:52:22.610Z",
+  "day": "2026-08-31",
+  "generatedAt": "2026-08-31T17:36:42.883Z",
   "redToday": {
-    "count": 12,
-    "text": "Pirineo Occidental, Somontano Oriental, Muela de Valmadrid, Bajo Ebro Forestal, Somontano Sur, Puertos de Beceite, Moncayo y Aranda, Depresión del Jalón, Sierras Ibéricas Centrales, Jiloca-Gallocanta, Maestrazgo y Turia."
+    "count": 3,
+    "text": "Jiloca-Gallocanta, Turia y Rodeno."
   },
   "redTomorrow": {
-    "count": 2,
-    "text": "Turia y Rodeno."
+    "count": 0,
+    "text": null
   }
 }
