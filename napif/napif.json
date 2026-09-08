@@ -1,12 +1,12 @@
 {
-  "day": "2026-09-07",
-  "generatedAt": "2026-09-07T15:50:22.321Z",
+  "day": "2026-09-08",
+  "generatedAt": "2026-09-08T14:31:41.729Z",
   "redToday": {
-    "count": 25,
-    "text": "Pirineo Oriental, Pirineo Occidental, Prepirineo Oriental, Prepirineo Central, Prepirineo Occidental, Somontano Occidental, Somontano Oriental, Valle del Ebro Agrícola, Muelas del Ebro (Alcubierre, Valmadrid y Zuera), Bajo Ebro Forestal, Puertos de Beceite, Somontano Sur, Moncayo y Aranda, Depresión del Jalón, Sierras Ibéricas Centrales, Maestrazgo, Jiloca- Gallocanta, Turia, Montes Universales, Rodeno, Gudar, Mijares y Javalambre."
+    "count": 23,
+    "text": "Bajo Ebro Forestal, Depresión del Jalón, Javalambre, Jiloca-Gallocanta, Maestrazgo, Mijares, Moncayo y Aranda, Muela de Alcubierre, Muela de Valmadrid, Muela de Zuera, Pirineo Occidental, Pirineo Oriental, Prepirineo Central, Prepirineo Occidental, Prepirineo Oriental, Puertos de Beceite, Rodeno, Sierras Ibéricas Centrales, Somontano Occidental, Somontano Oriental, Somontano Sur, Turia y Valle del Ebro Agrícola."
   },
   "redTomorrow": {
-    "count": 0,
-    "text": null
+    "count": 1,
+    "text": "Somontano Occidental."
   }
 }
