@@ -1,7 +1,17 @@
 {
-  "Riesgo Andalucía (Worker+WMS)": {
-    "desde": "2026-09-21",
-    "ultimo": "2026-09-27",
-    "dias": 7
+  "Riesgo Asturias (Worker)": {
+    "desde": "2026-09-29",
+    "ultimo": "2026-09-29",
+    "dias": 1
+  },
+  "Riesgo La Rioja (Worker)": {
+    "desde": "2026-09-29",
+    "ultimo": "2026-09-29",
+    "dias": 1
+  },
+  "Riesgo Extremadura (Worker+INFOEX)": {
+    "desde": "2026-09-29",
+    "ultimo": "2026-09-29",
+    "dias": 1
   }
 }
