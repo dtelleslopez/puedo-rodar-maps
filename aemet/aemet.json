@@ -1,7 +1,7 @@
 {
- "day": "2026-10-06",
- "run": "2026-10-05",
- "generatedAt": "2026-10-06T12:00:43.569361+00:00",
+ "day": "2026-10-07",
+ "run": "2026-10-06",
+ "generatedAt": "2026-10-07T11:45:54.032749+00:00",
  "regions": {
   "madrid": {
    "today": 1,
@@ -9,19 +9,19 @@
   },
   "murcia": {
    "today": 1,
-   "tomorrow": 1
+   "tomorrow": 2
   },
   "cantabria": {
-   "today": 2,
+   "today": 1,
    "tomorrow": 1
   },
   "castilla-leon": {
    "today": 1,
-   "tomorrow": 1
+   "tomorrow": 2
   },
   "baleares": {
    "today": 1,
-   "tomorrow": 1
+   "tomorrow": 2
   }
  }
 }
