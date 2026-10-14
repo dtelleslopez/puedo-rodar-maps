@@ -1,7 +1,17 @@
 {
   "Riesgo Extremadura (Worker+INFOEX)": {
     "desde": "2026-10-13",
-    "ultimo": "2026-10-13",
+    "ultimo": "2026-10-14",
+    "dias": 2
+  },
+  "Riesgo Asturias (Worker)": {
+    "desde": "2026-10-14",
+    "ultimo": "2026-10-14",
+    "dias": 1
+  },
+  "Riesgo La Rioja (Worker)": {
+    "desde": "2026-10-14",
+    "ultimo": "2026-10-14",
     "dias": 1
   }
 }
