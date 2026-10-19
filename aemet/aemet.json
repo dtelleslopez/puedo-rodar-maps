@@ -1,7 +1,7 @@
 {
- "day": "2026-10-18",
- "run": "2026-10-17",
- "generatedAt": "2026-10-18T09:34:54.935164+00:00",
+ "day": "2026-10-19",
+ "run": "2026-10-18",
+ "generatedAt": "2026-10-19T10:43:54.926975+00:00",
  "regions": {
   "madrid": {
    "today": 1,
@@ -12,7 +12,7 @@
    "tomorrow": 1
   },
   "cantabria": {
-   "today": 1,
+   "today": 2,
    "tomorrow": 2
   },
   "castilla-leon": {
