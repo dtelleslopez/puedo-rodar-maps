@@ -1,17 +1,12 @@
 {
   "Riesgo Extremadura (Worker+INFOEX)": {
     "desde": "2026-10-13",
-    "ultimo": "2026-10-22",
-    "dias": 10
+    "ultimo": "2026-10-23",
+    "dias": 11
   },
   "NAPIF Aragón (json de la Action)": {
     "desde": "2026-10-17",
-    "ultimo": "2026-10-22",
-    "dias": 6
-  },
-  "Alertas Canarias (WP-JSON)": {
-    "desde": "2026-10-22",
-    "ultimo": "2026-10-22",
-    "dias": 1
+    "ultimo": "2026-10-23",
+    "dias": 7
   }
 }
