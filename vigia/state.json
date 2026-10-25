@@ -1,22 +1,17 @@
 {
   "Riesgo Extremadura (Worker+INFOEX)": {
     "desde": "2026-10-13",
-    "ultimo": "2026-10-24",
-    "dias": 12
+    "ultimo": "2026-10-25",
+    "dias": 13
   },
   "NAPIF Aragón (json de la Action)": {
     "desde": "2026-10-17",
-    "ultimo": "2026-10-24",
-    "dias": 8
+    "ultimo": "2026-10-25",
+    "dias": 9
   },
-  "Riesgo Asturias (Worker)": {
-    "desde": "2026-10-24",
-    "ultimo": "2026-10-24",
-    "dias": 1
-  },
-  "Riesgo La Rioja (Worker)": {
-    "desde": "2026-10-24",
-    "ultimo": "2026-10-24",
+  "Riesgo Andalucía (Worker+WMS)": {
+    "desde": "2026-10-25",
+    "ultimo": "2026-10-25",
     "dias": 1
   }
 }
